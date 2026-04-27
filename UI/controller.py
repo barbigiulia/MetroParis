@@ -1,5 +1,7 @@
 import flet as ft
-
+# GRAFO SEMPLICE, ORIENTATO, NON PESATO
+# ogni vertice = "Fermata"
+# due fermate sono collegate se esiste una connessione tra di esse
 
 class Controller:
     def __init__(self, view, model):
