@@ -28,10 +28,12 @@ class DAO():
         result = []
 
         cursor = conn.cursor(dictionary=True)
-        query = ("SELECT * "
-                 "FROM connessione c"
-                 "WHERE c.id_stazP =%s"
-                 "AND c.id_stazA =%s")
+        query = (
+            "SELECT * "
+            "FROM connessione c "
+            "WHERE c.id_stazP = %s "
+            "AND c.id_stazA = %s"
+        )
 
         cursor.execute(query, (u.id_fermata, v.id_fermata))
 
@@ -47,9 +49,11 @@ class DAO():
         conn = DBConnect.get_connection()
         result = []
         cursor = conn.cursor(dictionary=True)
-        query = ("SELECT * "
-                 "FROM connessione c"
-                 "WHERE c.id_stazP =%s")
+        query = (
+            "SELECT * "
+            "FROM connessione c "
+            "WHERE c.id_stazP = %s"
+        )
 
         cursor.execute(query, (u.id_fermata,)) # occhio alla virgola
         for row in cursor:
