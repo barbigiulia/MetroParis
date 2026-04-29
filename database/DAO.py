@@ -6,11 +6,9 @@ from model.fermata import Fermata
 class DAO():
 
     @staticmethod
-    def getAllFermate():
+    def getAllFermate():  # seleziono tutto dalla tabella fermata
         conn = DBConnect.get_connection()
-
         result = []
-
         cursor = conn.cursor(dictionary=True)
         query = "SELECT * FROM fermata"
         cursor.execute(query)
