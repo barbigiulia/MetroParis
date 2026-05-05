@@ -9,25 +9,30 @@ class Controller:
         self._view = view
         # the model, which implements the logic of the program and holds the data
         self._model = model
-        self._fermataPartenza = None
+        self._fermataPartenza = None   # stato temporaneo scelto dall'utente
 
 
-    # CHIAMATO DAL PULSANTE
+    # CHIAMATO DAL PULSANTE "Crea Grafo"
     def handleCreaGrafo(self,e):
-        self._model.buildGraph() # costruisco il grafo
+        self._model.buildGraph() # funzione che costruisce il grafo
         self._view.lst_result.controls.clear()
         self._view.lst_result.controls.append(ft.Text("Grafo correttamente creato"))
         self._view.lst_result.controls.append(ft.Text(f"Il grafo ha {self._model.get_numnodi()} nodi e {self._model.get_numArchi()} archi "))
         self._view.update_page()
 
+
+
+    # attivato dal bottone "Calcola Raggiungibili"
     def handleCercaRaggiungibili(self,e):
-        if self._fermataPartenza is None:
+        if self._fermataPartenza is None:  # gestione errore UI --> evita crash logico
             self._view.lst_result.controls.clear()
             self._view.lst_result.controls.append(ft.Text("Attenzione non è stata scelta la stazione di partenza",
                                                           color="red"))
             self._view.update_page()
             return
         # se invece l'utente ha scelto la fermata dii partenza (source)
+        # BFS visita in ampiezza
+        # parte dalla fermata selezionata e ritorna la lista di nodi raggiungibili
         nodes = self._model.getBFSNodesFromEdges(self._fermataPartenza)
         self._view.lst_result.controls.clear()
         self._view.lst_result.controls.append(ft.Text(f"DI seguito i nodi raggiungibili da {self._fermataPartenza}"))
@@ -38,12 +43,13 @@ class Controller:
 
     # RIEMPIE DUE DIVERSI DROPDOWN
     def loadFermate(self, dd: ft.Dropdown()):
-        fermate = self._model.fermate
+        fermate = self._model.fermate  # lista di tutte le stazioni metro
 
+        # Secondo il campo di testo in cui è stata selezionata la fermata
         if dd.label == "Stazione di Partenza":
             for f in fermate:
-                dd.options.append(ft.dropdown.Option(text=f.nome,
-                                                     data=f, # oggetto stesso !!
+                dd.options.append(ft.dropdown.Option(text=f.nome,  # quello che vede l'utente
+                                                     data=f, # oggetto Fermata reale
                                                      on_click=self.read_DD_Partenza))
         elif dd.label == "Stazione di Arrivo":
             for f in fermate:
@@ -52,6 +58,7 @@ class Controller:
                                                      on_click=self.read_DD_Arrivo ))
                                                     # fz chiamata quando chiamo quel campo
 
+    # SALVA LA FERMATA SCELTA DALL'UTENTE
     def read_DD_Partenza(self,e):
         print("read_DD_Partenza called ")
         if e.control.data is None:

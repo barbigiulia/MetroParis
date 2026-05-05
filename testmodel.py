@@ -9,7 +9,7 @@ print("Numero nodi: ", model.get_numnodi())
 print("Numero archi: ", model.get_numArchi())
 
 # testo la funzione
-model.buildGraph()
+model.buildGraphPesato()    # uso questo!!
 # mi aspetto un numero > 0
 print("Numero nodi: ", model.get_numnodi())
 print("Numero archi: ", model.get_numArchi())
@@ -28,3 +28,13 @@ nodiDFS = model.getDFSNodesFromEdges(source)
 print(len(nodiDFS))
 for j in range(0,10): #stampo i primi 10
     print(nodiDFS[j])
+
+
+
+
+print("===============================================")
+print("Archi con peso 2: ")
+# chiamo un metodo scritto nel model apposta che li calcola
+archiMaggiori = model.archiPesoMaggiore()
+for a in archiMaggiori:
+    print(a[0], "->", a[1], ":", a[2]["weight"])

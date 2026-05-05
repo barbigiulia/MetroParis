@@ -37,13 +37,18 @@ class View(ft.UserControl):
                       alignment=ft.MainAxisAlignment.CENTER)
 
         # Row with controls
-        self._btnCrea = ft.ElevatedButton(text="Crea Grafo", on_click=self._controller.handleCreaGrafo)
+        # quando clicco il bottone, crea il grafo in una delle 3 modalità
+        self._btnCrea = ft.ElevatedButton(text="Crea Grafo",
+                                          on_click=self._controller.handleCreaGrafo)
         self._ddStazPartenza = ft.Dropdown(label="Stazione di Partenza")
         self._ddStazArrivo = ft.Dropdown(label="Stazione di Arrivo")
-        self._btnCalcola = ft.ElevatedButton(text="Calcola Raggiungibili", on_click=self._controller.handleCercaRaggiungibili)
+
+        # bottone che avvia il BFS o DFS
+        self._btnCalcola = ft.ElevatedButton(text="Calcola Raggiungibili",
+                                             on_click=self._controller.handleCercaRaggiungibili)
 
 
-        #Load elements in DD
+        # POPOLAMENTO DEL DROPDOWN
         self._controller.loadFermate(self._ddStazPartenza)
         self._controller.loadFermate(self._ddStazArrivo)
 
