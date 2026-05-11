@@ -21,6 +21,7 @@ class View(ft.UserControl):
         self._ddStazArrivo = None
         self._ddStazPartenza = None
         self._btnCrea = None
+        self._btnTrovaPercorso = None
 
     def load_interface(self):
         # title
@@ -48,6 +49,10 @@ class View(ft.UserControl):
                                              on_click=self._controller.handleCercaRaggiungibili)
 
 
+        self._btnTrovaPercorso = ft.ElevatedButton(text="Trova percorso",
+                                                   on_click= self._controller.handleTrovaPercorso)
+
+
         # POPOLAMENTO DEL DROPDOWN
         self._controller.loadFermate(self._ddStazPartenza)
         self._controller.loadFermate(self._ddStazArrivo)
@@ -57,6 +62,7 @@ class View(ft.UserControl):
                        self._ddStazPartenza,
                        self._ddStazArrivo,
                        self._btnCalcola,
+                       self._btnTrovaPercorso
                        ], alignment=ft.MainAxisAlignment.CENTER, spacing=30)
 
         # Row with listview

@@ -1,8 +1,19 @@
 import datetime
-from random import weibullvariate
-
+import geopy
 from database.DAO import DAO
 import networkx as nx
+from datetime import datetime
+
+
+# metodo statico che non fa parte della classe
+def getPesoTempoPercorrenza(u,v,vel):
+        # u e v sono due oggetti Fermata !
+        dist = geopy.distance.distance((u.coordX, u.coordY),
+                                       (v.coordX, v.coordY)).km
+        # calcola la distanza su sfera --> prende due tuple come parametri
+        time = dist/vel *60   # minuti
+        # km/(km/h)*60
+        return time # stima di quanto tempo impiego da una fermata all'altra
 
 class Model:
     def __init__(self):
@@ -19,9 +30,9 @@ class Model:
     def buildGraphPesato(self):
         self._grafo.clear()
         self._grafo.add_nodes_from(self._fermate)   # aggiungo i nodi (finora nulla di nuovo
-
         # cosa cambia: come aggiungo gli archi
-        self.addEdgesPesati()
+        #self.addEdgesPesati()
+        self.addEdgesPesatiTempi()
 
 
 
@@ -152,11 +163,29 @@ class Model:
 # NUM CONNESSIONI (DEL DATABASE) != NUM DI ARCHI AGGIUNTI
 # QUESTO SUCCEDE PERCHE' CI SONO ALCUNE FERMATE SERVITE DA PIU' LINEE !!
     # questa cosa non succederebbe se avessimo un MultiGraph() --> 2^ richiesta dell'esercizio
+# ==========================================================
+    def addEdgesPesatiTempi(self):
+        # questo metodo crea degli archi, il cui peso è uguale
+        # al tempo di percorrenza di quell'arco
+        # ottenuto come rapporto fra la distanza fra due stazioni e la velocità
+        # di percorrenza
+        self._grafo.clear_edges()
+        # leggo gli archi dal DAO
+        allEdgesVelocita = DAO.getEdgesVelocita()
+        # devo però calcolare ancora i pesi!!
+        for e in allEdgesVelocita:
+            u = self._idMapFermate[e[0]]
+            v = self._idMapFermate[e[1]]
+            peso = getPesoTempoPercorrenza(u, v, e[2]) # metodo statico fuori dalla classe
+            # ora posso aggiungere il peso al grafo
+            self._grafo.add_edge(u, v, weight=peso)
 
-
-
+# =====================================================================
+    def getShortestPath(self, u, v):
+        # USO DIJKSTRA
+        return nx.single_source_dijkstra(self._grafo,u,v)
     # ==========================================================================
-    # ACCEDO AI PARAMTERI DEL GRAFO
+    # ACCEDO AI PARAMETRI DEL GRAFO
 
     def get_numnodi(self):
         return len(self._grafo.nodes())

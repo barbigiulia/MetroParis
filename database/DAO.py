@@ -100,7 +100,28 @@ class DAO():
         cursor.execute(query)
 
         for row in cursor:
-            result.append(row["id_stazP"], row["id_stazA"], row["peso"])
+            result.append((row["id_stazP"], row["id_stazA"], row["peso"]))
+        cursor.close()
+        conn.close()
+        return result
+
+    @staticmethod
+    def getEdgesVelocita():
+        conn = DBConnect.get_connection()
+        result = []
+        cursor = conn.cursor(dictionary=True)
+        query = """select c.id_stazP , c.id_stazA , max(l.velocita ) as v
+                    from connessione c, linea l
+                    where c.id_linea = l.id_linea 
+                    group by c.id_stazP , c.id_stazA 
+                    order by v asc 
+                    """
+        # il risultato della query è diverso da Connessione.py
+        cursor.execute(query)
+
+        for row in cursor:
+            # IN UNA TUPLA DI TRE DATI
+            result.append((row["id_stazP"], row["id_stazA"], row["v"]))
         cursor.close()
         conn.close()
         return result

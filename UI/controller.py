@@ -72,3 +72,36 @@ class Controller:
             self._fermataArrivo = None
         else:
             self._fermataArrivo = e.control.data
+
+
+
+    # =========== BOTTONE - TROVA PERCORSO ============================
+    def handleTrovaPercorso(self, e):
+        # recupero i dati che mi servono
+        if self._fermataPartenza is None or self._fermataArrivo is None :
+            self._view.lst_result.controls.clear()
+            self._view.lst_result.controls.append(ft.Text("Attenzione, necessario"
+                                                          " selezionare fermate di partenza ed arrivo",
+                                                          color="red"))
+            self._view.update_page()
+            return
+        tot_time , optPath = self._model.getShortestPath(self._fermataPartenza, self._fermataArrivo)
+        # se non trovo il percorso --> l'algoritmo restituisce un cammino vuoto
+        if optPath ==[]:
+            self._view.lst_result.controls.clear()
+            self._view.lst_result.controls.append(ft.Text(f"Non ho trovato un cammino fra"
+                                                          f" {self._fermataPartenza} e {self._fermataArrivo} ",
+                                                          color="orange"))
+            self._view.update_page()
+            return
+        # se invece ho trovato il cammino
+        self._view.lst_result.controls.clear()
+        self._view.lst_result.controls.append(ft.Text(f"Ho trovato un cammino fra"
+                                                      f" {self._fermataPartenza} e {self._fermataArrivo} "
+                                                      f"che impiega {tot_time} minuti",
+                                                      color="green"))
+        self._view.lst_result.controls.append(ft.Text("Di seguito la lista di fermate"))
+        for v in optPath:
+            # stampo la sequenza di nodi
+            self._view.lst_result.controls.append(ft.Text(v))
+        self._view.update_page()
