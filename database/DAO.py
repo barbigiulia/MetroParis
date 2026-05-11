@@ -71,7 +71,7 @@ class DAO():
         result = []
         cursor = conn.cursor(dictionary=True)
         query = "SELECT * FROM connessione"
-        # PRENDE TUTTE LE RIGHE DELLA TABELLA CONNESSIONE, cioò tutti gli archi del grafo
+        # PRENDE TUTTE LE RIGHE DELLA TABELLA CONNESSIONE, cioè tutti gli archi del grafo
         # ogni oggetto rappresenta un arco del grafo
         # [
         #   Connessione(id_stazP=1, id_stazA=2),
@@ -110,6 +110,8 @@ class DAO():
         conn = DBConnect.get_connection()
         result = []
         cursor = conn.cursor(dictionary=True)
+        # RECUPERO PER OGNI COPPIA DI FERMATE COLLEGATE, LA VELOCITA'
+        # MASSIMA TRA LE LINEE CHE LE CONNETTONO (SCELTO LA LINEA PIU' VELOCE)
         query = """select c.id_stazP , c.id_stazA , max(l.velocita ) as v
                     from connessione c, linea l
                     where c.id_linea = l.id_linea 

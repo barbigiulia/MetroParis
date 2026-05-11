@@ -8,8 +8,7 @@ from datetime import datetime
 # metodo statico che non fa parte della classe
 def getPesoTempoPercorrenza(u,v,vel):
         # u e v sono due oggetti Fermata !
-        dist = geopy.distance.distance((u.coordX, u.coordY),
-                                       (v.coordX, v.coordY)).km
+        dist = geopy.distance.distance((u.coordX, u.coordY),(v.coordX, v.coordY)).km
         # calcola la distanza su sfera --> prende due tuple come parametri
         time = dist/vel *60   # minuti
         # km/(km/h)*60
@@ -18,7 +17,7 @@ def getPesoTempoPercorrenza(u,v,vel):
 class Model:
     def __init__(self):
         self._fermate = DAO.getAllFermate() # Tutte le fermate del database
-        self._grafo = nx.DiGraph()  # istanza del Grafo orientato, semplice, non pesatp
+        self._grafo = nx.DiGraph()  # istanza del Grafo orientato, semplice, non pesato
         self._idMapFermate = {}  #dizionario per collegare id_fermata --> oggetto fermata
 
         # PER RECUPERARE L'OGGETTO DATO L'ID (in questo caso
@@ -50,7 +49,6 @@ class Model:
             else:
                 self._grafo.add_edge(u,v, weight=1)  # altrimenti lo creo, con peso = 1
 
-
         # ALTRIMENTI POSSO FARE QUESTO NEL DAO --> se la query non è complicata
 
 
@@ -70,12 +68,15 @@ class Model:
         # restituisce gli archi con peso > 1
         edges = self._grafo.edges(data=True) # metodo di _grafo
         # data = True, stampa gli archi con il loro peso
+        # restituisce tutti gli archi cosi: (u, v, {"weight": 3})
         edgesMaggiori = []
         for e in edges:
             if self._grafo.get_edge_data(e[0], e[1])["weight"] > 1:  # uso il metodo della libreria per filtrare
                 # self._grafo[e[0]][e[1]]["weight"]
                 edgesMaggiori.append(e)
         return edgesMaggiori
+
+
 # ================== BFS ================================================
     def getBFSNodesFromEdges(self, source):
         archi = nx.bfs_edges(self._grafo, source)
@@ -143,6 +144,7 @@ class Model:
     # 2) METODO INTERMEDIO
     def addedges2(self):
         self._grafo.clear_edges()
+        # 619 fermate --> 619 query
         # data una fermata, prendo quelle vicine
         for u in self._fermate:   # guardo i suoi vicini adiacenti
             for connessione in DAO.getVicini(u):
@@ -172,9 +174,9 @@ class Model:
         self._grafo.clear_edges()
         # leggo gli archi dal DAO
         allEdgesVelocita = DAO.getEdgesVelocita()
-        # devo però calcolare ancora i pesi!!
-        for e in allEdgesVelocita:
-            u = self._idMapFermate[e[0]]
+        # devo però calcolare ancora i pesi!
+        for e in allEdgesVelocita: # e = (stazP, stazA, velocità)
+            u = self._idMapFermate[e[0]] # recupero la fermata con id = e[0]
             v = self._idMapFermate[e[1]]
             peso = getPesoTempoPercorrenza(u, v, e[2]) # metodo statico fuori dalla classe
             # ora posso aggiungere il peso al grafo
@@ -182,7 +184,11 @@ class Model:
 
 # =====================================================================
     def getShortestPath(self, u, v):
-        # USO DIJKSTRA
+        # USO DIJKSTRA per TROVARE IL CAMMINO MINIMO
+        # il metodo restituisce una tupla = (costo_totale, lista_nodi_percorso)
+        # l'algoritmo funziona esplorando prima i nodi con costo accumulato minore
+        # e garantisce il cammino ottimo su grafi con pesi non negativi
+        # nel nostro caso i tempi sono sempre >0
         return nx.single_source_dijkstra(self._grafo,u,v)
     # ==========================================================================
     # ACCEDO AI PARAMETRI DEL GRAFO
